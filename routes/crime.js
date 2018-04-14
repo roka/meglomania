@@ -6,9 +6,15 @@ const crimeUrl = "https://brottsplatskartan.se/api/events/?location=";
 
 /* Get crimes in city. */
 router.post('/', function (req, res, next) {
-    var location = req.body;
+    var location = req.body.city;
+    location.replace('å', 'a');
+    location.replace('Å', 'A');
+    location.replace('ä', 'a');
+    location.replace('Ä', 'A');
+    location.replace('ö', 'o');
+    location.replace('Ö', 'O');
 
-    fetch(crimeUrl + location.city,
+    fetch(crimeUrl + location,
         {
             headers: {
                 'Accept': 'application/json',
@@ -18,7 +24,6 @@ router.post('/', function (req, res, next) {
         })
         .then(resp => resp.json())
         .then(json => {
-            console.log(json);
 
             if(json.links.total >= 1) {
                 var crimeJson = {
@@ -27,7 +32,6 @@ router.post('/', function (req, res, next) {
                     "location": json.data[0].title_location,
                     "description": json.data[0].description
                 };
-                console.log(crimeJson);
                 res.send(crimeJson);
             } else {
                 res.send({

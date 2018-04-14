@@ -7,6 +7,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var scbRouter = require('./routes/scb');
 var crimeRouter = require('./routes/crime')
+var googlePlacesRouter = require('./routes/googlePlaces');
 
 var app = express();
 
@@ -23,6 +24,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/scb', scbRouter);
 app.use('/crime', crimeRouter);
+app.use('/googlePlaces', googlePlacesRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

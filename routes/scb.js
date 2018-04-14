@@ -262,4 +262,59 @@ router.get('/party', function (req, res, next) {
   });
 });
 
+router.get('/scientists', function (req, res, next) {
+  var cityId = req.query.cityId;
+  console.log('cityId', cityId);
+  axios.post('http://api.scb.se/OV0104/v1/doris/sv/ssd/START/UF/UF0506/Utbildning', {
+    "query": [
+      {
+        "code": "Region",
+        "selection": {
+          "filter": "vs:RegionKommun07",
+          "values": [
+            cityId
+          ]
+        }
+      },
+      {
+        "code": "Alder",
+        "selection": {
+          "filter": "vs:ÅlderTotB",
+          "values": [
+            "tot16-74"
+          ]
+        }
+      },
+      {
+        "code": "UtbildningsNiva",
+        "selection": {
+          "filter": "item",
+          "values": [
+            "7"
+          ]
+        }
+      },
+      {
+        "code": "Tid",
+        "selection": {
+          "filter": "item",
+          "values": [
+            "2016"
+          ]
+        }
+      }
+    ],
+    "response": {
+      "format": "json"
+    }
+}).then(result => {
+    var buffer = new Buffer(result.data);
+    var data = JSON.parse(buffer.slice(3, buffer.length).toString());
+    res.send(data);
+  }).catch(err => {
+    console.error('Error', err);
+    res.sendStatus(500);
+  });
+});
+
 module.exports = router;

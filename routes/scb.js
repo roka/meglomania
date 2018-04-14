@@ -148,4 +148,41 @@ router.get('/folkmangdTatort', function (req, res, next) {
   });
 });
 
+router.get('/population', function (req, res, next) {
+  var cityId = req.query.cityId;
+  console.log('cityId', cityId);
+  axios.post('http://api.scb.se/OV0104/v1/doris/sv/ssd/START/BE/BE0101/BE0101A/BefolkningNy', {
+    "query": [
+      {
+        "code": "Region",
+        "selection": {
+          "filter": "vs:RegionKommun07",
+          "values": [
+            cityId
+          ]
+        }
+      },
+      {
+        "code": "ContentsCode",
+        "selection": {
+          "filter": "item",
+          "values": [
+            "BE0101N1"
+          ]
+        }
+      }
+    ],
+    "response": {
+      "format": "json"
+    }
+  }).then(result => {
+    var buffer = new Buffer(result.data);
+    var data = JSON.parse(buffer.slice(3, buffer.length).toString());
+    res.send(data);
+  }).catch(err => {
+    console.error('Error', err);
+    res.sendStatus(500);
+  });
+});
+
 module.exports = router;

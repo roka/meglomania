@@ -185,4 +185,67 @@ router.get('/population', function (req, res, next) {
   });
 });
 
+router.get('/party', function (req, res, next) {
+  var cityId = req.query.cityId;
+  console.log('cityId', cityId);
+  axios.post('http://api.scb.se/OV0104/v1/doris/sv/ssd/START/ME/ME0104/ME0104C/ME0104T3', {
+  "query": [
+    {
+      "code": "Region",
+      "selection": {
+        "filter": "vs:RegionKommun07+BaraEjAggr",
+        "values": [
+          cityId
+        ]
+      }
+    },
+    {
+      "code": "Partimm",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "M",
+          "C",
+          "FP",
+          "KD",
+          "MP",
+          "S",
+          "V",
+          "SD",
+          "ÖVRIGA"
+        ]
+      }
+    },
+    {
+      "code": "ContentsCode",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "ME0104B7"
+        ]
+      }
+    },
+    {
+      "code": "Tid",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "2014"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "format": "json"
+  }
+}).then(result => {
+    var buffer = new Buffer(result.data);
+    var data = JSON.parse(buffer.slice(3, buffer.length).toString());
+    res.send(data);
+  }).catch(err => {
+    console.error('Error', err);
+    res.sendStatus(500);
+  });
+});
+
 module.exports = router;

@@ -317,4 +317,51 @@ router.get('/scientists', function (req, res, next) {
   });
 });
 
+router.post('/chicken', function (req, res, next) {
+
+  console.log(req.body);
+  fetch("http://api.scb.se/OV0104/v1/doris/sv/ssd/START/JO/JO0103/HusdjurL",
+    {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: "POST",
+      body: JSON.stringify(
+        {
+          "query": [
+            {
+              "code": "Region",
+              "selection": {
+                "filter": "vs:Region99LanGU",
+                "values": [
+                  req.body.countyId
+                ]
+              }
+            },
+            {
+              "code": "Djurslag",
+              "selection": {
+                "filter": "item",
+                "values": [
+                  "65"
+                ]
+              }
+            }
+          ],
+          "response": {
+            "format": "json"
+          }
+        })
+    })
+    .then(resp => {
+      return resp.buffer();
+    })
+    .then(buffer => {
+      resJson = JSON.parse(buffer.slice(3, buffer.length).toString());
+      res.send(resJson);
+    })
+    .catch(error => console.error('Error:', error))
+});
+
 module.exports = router;

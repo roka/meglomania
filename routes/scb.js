@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var fetch = require('node-fetch');
+var axios = require('axios');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
@@ -105,6 +106,32 @@ router.post('/region', function (req, res, next) {
                 "countyId": countyId
             });
         });
+});
+
+router.get('/folkmangdTatort', function (req, res, next) {
+  axios.post('http://api.scb.se/OV0104/v1/doris/sv/ssd/START/BE/BE0101/BE0101A/FolkmangdTatort', {
+    "query": [
+      {
+        "code": "Region",
+        "selection": {
+          "filter": "agg:Blekinge",
+          "values": [
+            "T2680"
+          ]
+        }
+      }
+    ],
+    "response": {
+      "format": "json"
+    }
+  }).then(result => {
+    var buffer = new Buffer(result.data);
+    var data = JSON.parse(buffer.slice(3, buffer.length).toString());
+    res.send(data);
+  }).catch(err => {
+    console.error('Error', err);
+    res.sendStatus(500);
+  });
 });
 
 module.exports = router;

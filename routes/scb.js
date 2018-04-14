@@ -74,12 +74,9 @@ router.post('/region', function (req, res, next) {
         })
         .then(resp => resp.json())
         .then(json => {
-            console.log(json.variables[0]);
-
             var values = json.variables[0].values;
             var valueText = json.variables[0].valueTexts;
 
-            console.log(valueText[0]);
             var testArr = values.map(function (x, i) {
                 return { "name": valueText[i], "id": x }
             }.bind(this));

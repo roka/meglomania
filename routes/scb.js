@@ -67,12 +67,26 @@ router.post('/region', function (req, res, next) {
           if (type === "postal_town") {
             city = ac.long_name;
           } else if (type === "administrative_area_level_1") {
-            county = ac.long_name.split(' ');
+            county = ac.long_name;
           }
         });
       });
     });
 
+    // VARNING: Fulhax!
+    if (city === "Gothenburg") {
+      city = "Göteborg";
+    }
+
+    var end = county.search(' County'); 
+    if (end >= 0) {
+      county = county.substr(0, end);
+    }
+
+    end = county.search(' län'); 
+    if (end >= 0) {
+      county = county.substr(0, end);
+    }
 
     /*
     var city = req.body.data.results[2].address_components[1].long_name;

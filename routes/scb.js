@@ -59,8 +59,25 @@ router.get('/', function (req, res, next) {
 /* POST get region from string */
 router.post('/region', function (req, res, next) {
     /* http://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0101/BE0101A/BefolkningNy */
-    var city = req.body.data.results[2].address_components[0].long_name;
+    var city, county;
+
+    req.body.data.results.forEach((address) => {
+      address.address_components.forEach((ac) => {
+        ac.types.forEach((type) => {
+          if (type === "postal_town") {
+            city = ac.long_name;
+          } else if (type === "administrative_area_level_1") {
+            county = ac.long_name.split(' ');
+          }
+        });
+      });
+    });
+
+
+    /*
+    var city = req.body.data.results[2].address_components[1].long_name;
     var county = req.body.data.results[2].address_components[2].long_name.split(" ")[0];
+    */
     console.log(city);
     console.log(county);
 

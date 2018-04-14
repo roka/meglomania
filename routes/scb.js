@@ -51,8 +51,60 @@ router.get('/', function (req, res, next) {
         .then(buffer => {
             resJson = JSON.parse(buffer.slice(3, buffer.length).toString());
             res.send(resJson);
-        }) 
+        })
         .catch(error => console.error('Error:', error))
+});
+
+/* POST get region from string */
+router.post('/region', function (req, res, next) {
+    /* http://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0101/BE0101A/BefolkningNy */
+    var city = req.body.data.results[2].address_components[0].long_name;
+    var county = req.body.data.results[2].address_components[2].long_name.split(" ")[0];
+    console.log(city);
+    console.log(county);
+
+    fetch("http://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0101/BE0101A/BefolkningNy",
+        {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: "GET"
+        })
+        .then(resp => resp.json())
+        .then(json => {
+            console.log(json.variables[0]);
+
+            var values = json.variables[0].values;
+            var valueText = json.variables[0].valueTexts;
+
+            console.log(valueText[0]);
+            var testArr = values.map(function (x, i) {
+                return { "name": valueText[i], "id": x }
+            }.bind(this));
+            
+            var cityId;
+            var countyId;
+            var i;
+            for(i = 0; i < values.length; i++) {
+                if(valueText[i] === city) {
+                    cityId = values[i];
+                }
+
+                if(valueText[i] === county + " län") {
+                    countyId = values[i];
+                }
+            }
+
+            console.log("cityid=", cityId, " countyId=", countyId);
+
+            res.send({
+                "city": city,
+                "cityId": cityId,
+                "county": county,
+                "countyId": countyId
+            });
+        });
 });
 
 module.exports = router;
